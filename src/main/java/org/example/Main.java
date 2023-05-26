@@ -32,74 +32,17 @@ public class Main {
         }).start();
 
         Thread countA = new Thread(() -> {
-            String biggestText = "";
-            int include = 0;
-
-            for (int i = 0; i < TEXTS_COUNT; i++) {
-                String text;
-                try {
-                    text = textsToA.take();
-                    System.out.println("                Text processed");
-                } catch (InterruptedException e) {
-                    return;
-                }
-
-                int aInText = countChar(text, 'a');
-
-                if (aInText > include) {
-                    include = aInText;
-                    biggestText = text;
-                }
-            }
-            System.out.println("Max include 'a' (" + include + ") in text: \n" + biggestText);
+            runThread(textsToA, 'a');
         });
         threads.add(countA);
 
         Thread countB = new Thread(() -> {
-            String biggestText = "";
-            int include = 0;
-
-            for (int i = 0; i < TEXTS_COUNT; i++) {
-                String text;
-                try {
-                    text = textsToB.take();
-                    System.out.println("                Text processed");
-                } catch (InterruptedException e) {
-                    return;
-                }
-
-                int bInText = countChar(text, 'b');
-
-                if (bInText > include) {
-                    include = bInText;
-                    biggestText = text;
-                }
-            }
-            System.out.println("Max include 'b' (" + include + ") in text: \n" + biggestText);
+            runThread(textsToB, 'b');
         });
         threads.add(countB);
 
         Thread countC = new Thread(() -> {
-            String biggestText = "";
-            int include = 0;
-
-            for (int i = 0; i < TEXTS_COUNT; i++) {
-                String text;
-                try {
-                    text = textsToC.take();
-                    System.out.println("                Text processed");
-                } catch (InterruptedException e) {
-                    return;
-                }
-
-                int cInText = countChar(text, 'c');
-
-                if (cInText > include) {
-                    include = cInText;
-                    biggestText = text;
-                }
-            }
-            System.out.println("Max include 'c' (" + include + ") in text: \n" + biggestText);
+            runThread(textsToC, 'c');
         });
         threads.add(countC);
 
@@ -114,6 +57,29 @@ public class Main {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public static void runThread (BlockingQueue<String> queue, char c) {
+        String biggestText = "";
+        int include = 0;
+
+        for (int i = 0; i < TEXTS_COUNT; i++) {
+            String text;
+            try {
+                text = queue.take();
+                System.out.println("                Text processed");
+            } catch (InterruptedException e) {
+                return;
+            }
+
+            int charInText = countChar(text, c);
+
+            if (charInText > include) {
+                include = charInText;
+                biggestText = text;
+            }
+        }
+        System.out.println("Max include '" + c + "' (" + include + ") in text: \n" + biggestText);
     }
 
     public static int countChar(String text, char c) {
